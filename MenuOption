@@ -1,0 +1,22 @@
+from javax.swing import JFrame, JMenuBar, JMenu, JMenuItem
+
+class MenuWindow(JFrame):
+	def __init__(self):
+		menuBar = JMenuBar()
+		appetizerMenu = JMenu("Seafood")
+		appetizerMenu.add(JMenuItem("Jackson Pollock", actionPerformed= self.respond))
+		menuBar.add(appetizerMenu)
+		self.setJMenuBar(menuBar)
+
+	def respond(self, event):
+		item = event.getSource().text
+		if item[0]=="J":
+			response = "Do you want your Pollock on canvas?"
+		elif item[0]=="C":
+			response = "Squid Squares for you!"
+		else: response = "We don't have it."
+		print response
+
+mwin = MenuWindow()
+mwin.size=(300,100)
+mwin.visible=True

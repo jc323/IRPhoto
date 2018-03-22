@@ -1,0 +1,103 @@
+from java.lang import Runnable
+from java.util import Random
+from java.util.concurrent import ExecutionException
+from javax.swing import JButton, JFrame, JLabel, JPanel
+from javax.swing import SwingWorker, SwingUtilities
+from java.awt import GridLayout as awtGridLayout
+
+class ControlPanel(JFrame):
+	def __init__(self):
+		JFrame.__init__(self, "A Control Window for PixelMath Operations", defaultCloseOperation = JFrame.HIDE_ON_CLOSE)
+		self.contentPane.setLayout(awtGridLayout(1, 2))
+
+	panel = JPanel(awtGridLayout(0, 1))
+	computeButton1 = JButton("Compute a nearinfrared")
+	computeButton2 = JButton("Compute Final")
+	self.BeginRandomButton = JButton("Start stream of random colors")
+	self.EndRandomButton = JButton("End Random color")
+	computeButton1.actionPerformed = lambda e: self.doCompute1()
+	computeButton2.actionPerformed = lambda e: self.doCompute2()
+	self.BeginRandomButton.actionPerfromed = lambda e: self.startRandom()
+	self.BeginRandomButton.enabled = True
+	self.EndRandomButton.actionPerformed = lambda e: self.stopRandom()
+	self.EndRandomButton.enabled = False
+	panel1.add(computeButton1)
+	panel1.add(computeButton2)
+	panel1.add(self.BeginRandomButton)
+	panel1add(self.EndRandomButton)
+	self.contentPane.add(panel)
+	label = JLabel1('This is the control panel' ,  JLabel.CENTER)
+	self.contentPane.add(label)
+	self.formulaLabel1 = JLabel('formula normally is shown here')
+	self.contentPane.add(self.formulaLabel)
+	self.pack()
+	self.setVisible(1) 
+
+	def doCompute(self, formula):
+		self.formulaLabel1.setText(formula)
+
+		pi = ProcessImage(formula)
+		pi.execute()
+
+
+	def doCompute1(self):
+		print "You pressed Button 1"
+		self.doCompute("(sqr(x) +sqr(y)) mod 256")
+		
+	def doCompute2(self):
+		self.doCompute("RGB(x, y, 0)")
+
+	def startRandom(self):
+		self.BeginRandomButton.enabled = False
+		self.EndRandomButton.enabled = True
+		
+		self.randomColorProcess.cancel(True)
+		self.randomColorProcess = None
+
+class ProcessImage(SwingWorker):
+	def __init__(self, formula):
+		self.formula = formula
+		print "Creating the ProcessImage instance"
+		SwingWorker.__init__(self)
+	def doInBackground(self):
+		print "Beginning ProcessImage.doInBackground"
+		pmNewComputedImage("Nice Picture!", 256, 256, self.formula)
+	def done(self):
+		try:
+			self.get()
+		except ExecutionException, e:
+			hide(0)
+			print e.getCause()
+
+class ColorStream (SwingWorker):
+	def __init__ (self):
+		print "Creating the ColorStream instance"
+		SwingWorker.__init__(self)
+	def doInBackground(self):
+		print "Beginning ColorStream.doInBackground"
+		wn = pmNewComputedImage("Nice picture", 256, 256, "RGB(255, 0, 0)")
+		pmSetDestination(wn)
+		random_gen = Random()
+		while not self.isCancelled():
+			red = random_gen.nextInt() % 256
+			green = random_gen.nextInt() % 256
+			blue = random_gen.nextInt() % 256
+			pmSetFormula("RGB(" +str(red)+ ", " + str(green) + ", " + str(blue) + ")")
+			pmCompute()
+
+	def done(self):
+		try:
+			self.get()
+		except ExecutionException, e:
+			hide (0)
+			print e.getCause()
+
+class Runnable (Runnable):
+	def __init__(self, runMethod):
+		self._runMethod = runMethod
+
+	def run(self):
+		self._runMethod()
+
+SwingUtilities.invokeLater(Runnable(ControlPanel)) 
+
